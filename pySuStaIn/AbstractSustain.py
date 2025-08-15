@@ -123,14 +123,15 @@ class AbstractSustain(ABC):
         ml_sequence_prev_EM                 = []
         ml_f_prev_EM                        = []
 
-        pickle_dir                          = os.path.join(self.output_folder, 'pickle_files')
-        if not os.path.isdir(pickle_dir):
-            os.mkdir(pickle_dir)
+        # Ensure output and pickle directories exist (pathlib, parents=True, exist_ok=True)
+        output_path = Path(self.output_folder)
+        pickle_dir = output_path / 'pickle_files'
+        pickle_dir.mkdir(parents=True, exist_ok=True)
         if plot:
             fig0, ax0                           = plt.subplots()
         for s in range(self.N_S_max):
 
-            pickle_filename_s               = os.path.join(pickle_dir, self.dataset_name + '_subtype' + str(s) + '.pickle')
+            pickle_filename_s               = pickle_dir / (self.dataset_name + '_subtype' + str(s) + '.pickle')
             pickle_filepath                 = Path(pickle_filename_s)
             if pickle_filepath.exists():
                 print("Found pickle file: " + pickle_filename_s + ". Using pickled variables for " + str(s) + " subtype.")
@@ -154,7 +155,7 @@ class AbstractSustain(ABC):
 
                 pickle_file.close()
             else:
-                print("Failed to find pickle file: " + pickle_filename_s + ". Running SuStaIn model for " + str(s) + " subtype.")
+                print("Failed to find pickle file: " + str(pickle_filename_s) + ". Running SuStaIn model for " + str(s) + " subtype.")
 
                 ml_sequence_EM,     \
                 ml_f_EM,            \
@@ -186,8 +187,7 @@ class AbstractSustain(ABC):
             prob_subtype_stage               = self.subtype_and_stage_individuals(self.__sustainData, samples_sequence, samples_f, N_samples)   #self.subtype_and_stage_individuals(self.__data, samples_sequence, samples_f, N_samples)
             if not pickle_filepath.exists():
 
-                if not os.path.exists(self.output_folder):
-                    os.makedirs(self.output_folder)
+                Path(self.output_folder).mkdir(parents=True, exist_ok=True)
 
                 save_variables                          = {}
                 save_variables["samples_sequence"]      = samples_sequence
